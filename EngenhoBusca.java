@@ -93,7 +93,6 @@ public class EngenhoBusca {
                 int asc = (int) value.charAt(i);
                 total ^= asc;
             }
-            
         }
         return total;
     }
@@ -102,27 +101,21 @@ public class EngenhoBusca {
      * Generates the hash of a string.
      * @param x String that will have it's hash generated
      * @param T Size of the destination array
+     * @param i Number of tries
      * @return Hash of x
      */
-    private static int getHash(String x, int T) {
-        return 7919 * getChecksum(x) % T;
-    }
-
-    /**
-     * Generates the double hash of a string.
-     * @param x String that will have it's hash generated
-     * @param T Size of the destination array
-     * @return Double hash of x
-     */
-    private static int getDoubleHash(String x, int T) {
-        return (104729 * getChecksum(x) + 123) % T;
+    private static int getHash(String x, int T, int i) {
+        int checksum = getChecksum(x);
+        int h1 = 7919 * checksum;
+        int h2 = 104729 * checksum + 123;
+        return (h1 + i * h2) % T;
     }
 
     public static void main(String[] args) {
         try {
-            readFile(args[0]);
+            //readFile(args[0]);
 
-            // TODO: test server capacity attribution
+            System.out.println(getHash("cd ef", 3, 0));
             
         } catch (Exception ex) {
             ex.printStackTrace();
