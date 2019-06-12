@@ -5,18 +5,42 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
+class Text {
+    public String content;
+    public Text next;
+
+    public Text(String content) {
+        this.content = content;
+        next = null;
+    }
+}
+
 class Server {
-    public String[] texts;
+    public String texts;
 
     public Server(int capacity) {
-        texts = new String[capacity];
+        //texts = new String[capacity];
     }
 }
 
 public class EngenhoBusca {
 
     public static Server[] servers;
-    public static String[] texts;
+    public static Text texts = new Text("");
+
+    public static Text addToEndOfList(Text head, Text currentNode, Text newNode) {
+        
+        // TODO: implement this
+
+        return head;
+    }
+
+    public static void printTexts(Text currentNode) {
+        while (currentNode.next != null) {
+            System.out.println(currentNode.content);
+            currentNode = currentNode.next;
+        }
+    }
 
     /**
      * Reads file and returns it's content
@@ -44,13 +68,14 @@ public class EngenhoBusca {
             }
 
             // Reads the number of texts
-            texts = new String[Integer.parseInt(reader.readLine())];
+            int numberOfTexts = Integer.parseInt(reader.readLine());
 
             // Reads the texts
-            for (int n = 0; n < texts.length; n++) {
+            for (int n = 0; n < numberOfTexts; n++) {
                 line = reader.readLine();
                 int indexOfFirstSpace = line.indexOf(" ");
-                texts[n] = line.substring(++indexOfFirstSpace);
+                String content = line.substring(++indexOfFirstSpace);
+                texts = addToEndOfList(texts, texts, new Text(content));
             }
         }
     }
@@ -109,6 +134,8 @@ public class EngenhoBusca {
             }*/
 
             //System.out.println(getHash("cd ef", 3, 0));
+
+            printTexts(texts);
             
         } catch (Exception ex) {
             ex.printStackTrace();
