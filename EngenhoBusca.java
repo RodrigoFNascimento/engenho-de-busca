@@ -4,10 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 class Server {
     public String[] texts;
@@ -37,20 +33,14 @@ public class EngenhoBusca {
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
 
-            // Sets up the regular expressions
-            String regexServers = "^(\\d+) (\\d+)$";
-            String regexText = "(\\d+) (.+)";
-            Pattern patternServers = Pattern.compile(regexServers);
-            Pattern patternText = Pattern.compile(regexText);
-            Matcher m;
-
             // Reads the number of servers and their capacity
             line = reader.readLine();
-            m = patternServers.matcher(line);
-            m.matches();
-            servers = new Server[Integer.parseInt(m.group(1))];
+            String[] serversLine = line.split(" ");
+            int numberOfServers = Integer.parseInt(serversLine[0]);
+            int serversCapacity = Integer.parseInt(serversLine[1]);
+            servers = new Server[numberOfServers];
             for (int i = 0; i < servers.length; i++) {
-                servers[i] = new Server(Integer.parseInt(m.group(2)));
+                servers[i] = new Server(serversCapacity);
             }
 
             // Reads the number of texts
@@ -59,9 +49,8 @@ public class EngenhoBusca {
             // Reads the texts
             for (int n = 0; n < texts.length; n++) {
                 line = reader.readLine();
-                m = patternText.matcher(line);
-                m.matches();
-                texts[n] = m.group(2);
+                int indexOfFirstSpace = line.indexOf(" ");
+                texts[n] = line.substring(++indexOfFirstSpace);
             }
         }
     }
@@ -113,9 +102,13 @@ public class EngenhoBusca {
 
     public static void main(String[] args) {
         try {
-            //readFile(args[0]);
+            readFile(args[0]);
 
-            System.out.println(getHash("cd ef", 3, 0));
+            /*for (int i = 0; i < texts.length; i++) {
+                System.out.println(texts[i]);
+            }*/
+
+            //System.out.println(getHash("cd ef", 3, 0));
             
         } catch (Exception ex) {
             ex.printStackTrace();
