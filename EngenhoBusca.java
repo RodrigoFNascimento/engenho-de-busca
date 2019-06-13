@@ -16,10 +16,36 @@ class Text {
 }
 
 class Server {
-    public String texts;
+    public Text texts = new Text("");
+    public int capacity;
+    public boolean isFull;
 
     public Server(int capacity) {
-        //texts = new String[capacity];
+        this.capacity = capacity;
+    }
+
+    /**
+     * Adds text to the server if there's avaiable space
+     * @param newText Text to be added
+     * @return {@code true} if the text was added, {@code false} otherwise
+     */
+    public boolean addText(Text newText) {
+        if (isFull)
+            return false;
+
+        // Adds to the end of the text list
+        Text currentNode = texts;
+        int capacityUsed = 1;
+        while (currentNode.next != null) {
+            currentNode = currentNode.next;
+            capacityUsed++;
+        }
+        currentNode.next = new Text(newText.content);
+
+        if (capacityUsed >= capacity)
+            isFull = true;
+
+        return true;
     }
 }
 
@@ -28,15 +54,30 @@ public class EngenhoBusca {
     public static Server[] servers;
     public static Text texts = new Text("");
 
+    /**
+     * Recursively adds a node to the end of a list.
+     * @param head Head of the list
+     * @param currentNode Node currently being used by the method
+     * @param newNode Node to be added at the end of the list
+     * @return Head of the list with the added node
+     */
     public static Text addToEndOfList(Text head, Text currentNode, Text newNode) {
         
-        // TODO: implement this
-
+        if (currentNode.next == null) {
+            currentNode.next = newNode;
+        } else {
+            addToEndOfList(head, currentNode.next, newNode);
+        }
         return head;
     }
 
-    public static void printTexts(Text currentNode) {
-        while (currentNode.next != null) {
+    /**
+     * Prints a list
+     * @param head Head of the list
+     */
+    public static void printTexts(Text head) {
+        Text currentNode = head.next;
+        while (currentNode != null) {
             System.out.println(currentNode.content);
             currentNode = currentNode.next;
         }
@@ -125,17 +166,38 @@ public class EngenhoBusca {
         return (h1 + i * h2) % T;
     }
 
+    /**
+     * Stores text into the servers
+     * @param head Head of the text list
+     */
+    private static void storeText(Text head) {
+        Text currentNode = head.next;
+        while (currentNode != null) {
+            boolean stored = false;
+            int tries = 0;
+            while (!stored) {
+                int hash = getHash(currentNode.content, servers.length, tries++);
+                stored = servers[hash].addText(currentNode);
+            }
+            currentNode = currentNode.next;
+        }
+    }
+
+    private static void printServers() {
+        for (int i = 0; i < servers.length; i++) {
+            System.out.println("server " + i);
+            if (servers[i].texts.next != null)
+                System.out.println(servers[i].texts.next.content);
+            else System.out.println("nao tem");
+        }
+    }
+
     public static void main(String[] args) {
         try {
             readFile(args[0]);
 
-            /*for (int i = 0; i < texts.length; i++) {
-                System.out.println(texts[i]);
-            }*/
-
-            //System.out.println(getHash("cd ef", 3, 0));
-
-            printTexts(texts);
+            storeText(texts);
+            printServers();
             
         } catch (Exception ex) {
             ex.printStackTrace();
