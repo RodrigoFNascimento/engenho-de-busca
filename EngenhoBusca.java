@@ -27,13 +27,13 @@ class Server {
     /**
      * Adds text to the server if there's avaiable space
      * @param newText Text to be added
-     * @return {@code true} if the text was added, {@code false} otherwise
+     * @return {@code true} if the Text was added, {@code false} otherwise
      */
     public boolean addText(Text newText) {
         if (isFull)
             return false;
 
-        // Adds to the end of the text list
+        // Adds to the end of {@link #texts}
         Text currentNode = texts;
         int capacityUsed = 1;
         while (currentNode.next != null) {
@@ -51,8 +51,8 @@ class Server {
 
 public class EngenhoBusca {
 
-    public static Server[] servers;
-    public static Text texts = new Text("");
+    private static Server[] servers;
+    private static Text texts = new Text("");
 
     /**
      * Recursively adds a node to the end of a list.
@@ -61,7 +61,7 @@ public class EngenhoBusca {
      * @param newNode Node to be added at the end of the list
      * @return Head of the list with the added node
      */
-    public static Text addToEndOfList(Text head, Text currentNode, Text newNode) {
+    private static Text addToEndOfList(Text head, Text currentNode, Text newNode) {
         
         if (currentNode.next == null) {
             currentNode.next = newNode;
@@ -72,10 +72,10 @@ public class EngenhoBusca {
     }
 
     /**
-     * Prints a list
+     * Prints a list of Text.
      * @param head Head of the list
      */
-    public static void printTexts(Text head) {
+    private static void printTexts(Text head) {
         Text currentNode = head.next;
         while (currentNode != null) {
             System.out.println(currentNode.content);
@@ -84,7 +84,7 @@ public class EngenhoBusca {
     }
 
     /**
-     * Reads file and returns it's content
+     * Reads a file and returns it's content.
      * @param file File to be read
      * @return The content of the file
      * @throws IOException
@@ -122,7 +122,7 @@ public class EngenhoBusca {
     }
 
     /**
-     * Writes content to file
+     * Writes content to file.
      * @param fileName Name of the file (with extension) to be writen
      * @param content Content to be writen on the file
      * @throws FileNotFoundException
@@ -143,7 +143,7 @@ public class EngenhoBusca {
      */
     private static int getChecksum(String value) {
         int total = 0;
-        for (int i = 0; i < value.length(); i++){
+        for (int i = 0; i < value.length(); i++) {
             if (value.charAt(i) != ' ') {
                 int asc = (int) value.charAt(i);
                 total ^= asc;
@@ -167,28 +167,33 @@ public class EngenhoBusca {
     }
 
     /**
-     * Stores text into the servers
-     * @param head Head of the text list
+     * Stores Text into {@link #servers}.
+     * @param head Head of {@link #texts}
      */
     private static void storeText(Text head) {
+        int hash = 0;
         Text currentNode = head.next;
         while (currentNode != null) {
+
+            // Applies the double hash until the value is stored
             boolean stored = false;
             int tries = 0;
+            int primaryServer = 0;  // Result of the first try
             while (!stored) {
-                int hash = getHash(currentNode.content, servers.length, tries++);
-                stored = servers[hash].addText(currentNode);
-            }
-            currentNode = currentNode.next;
-        }
-    }
+                hash = getHash(currentNode.content, servers.length, tries++);
 
-    private static void printServers() {
-        for (int i = 0; i < servers.length; i++) {
-            System.out.println("server " + i);
-            if (servers[i].texts.next != null)
-                System.out.println(servers[i].texts.next.content);
-            else System.out.println("nao tem");
+                if (hash > -1 && hash < servers.length)
+                    stored = servers[hash].addText(currentNode);
+
+                if (tries == 1)
+                    primaryServer = hash;
+
+                // Prevents an infinite loop
+                if (tries > 10000000)
+                    throw new RuntimeException("Number of double hash tries exceeded");
+            }
+
+            currentNode = currentNode.next;
         }
     }
 
@@ -197,7 +202,6 @@ public class EngenhoBusca {
             readFile(args[0]);
 
             storeText(texts);
-            printServers();
             
         } catch (Exception ex) {
             ex.printStackTrace();
