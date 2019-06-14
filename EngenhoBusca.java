@@ -91,18 +91,6 @@ public class EngenhoBusca {
     }
 
     /**
-     * Prints a list of Text.
-     * @param head Head of the list
-     */
-    private static void printTexts(Text head) {
-        Text currentNode = head.next;
-        while (currentNode != null) {
-            System.out.println(currentNode.content);
-            currentNode = currentNode.next;
-        }
-    }
-
-    /**
      * Reads a file and returns it's content.
      * @param file File to be read
      * @return The content of the file
