@@ -47,6 +47,25 @@ class Server {
 
         return true;
     }
+
+    public StringBuilder getTexts() {
+        Text currentNode = texts;
+        StringBuilder result = new StringBuilder();
+
+        // Prints the first {@link Text}
+        if (currentNode.next != null) {
+            currentNode = currentNode.next;
+            result.append(currentNode.content);
+        }
+
+        // Prints the rest of the {@link Text}
+        while (currentNode.next != null) {
+            currentNode = currentNode.next;
+            result.append(", " + currentNode.content);
+        }
+
+        return result;
+    }
 }
 
 public class EngenhoBusca {
@@ -132,7 +151,7 @@ public class EngenhoBusca {
         // Opens file
         try (PrintWriter out = new PrintWriter(fileName)) {
             // Writes content to file
-            out.print(content);
+            out.print(content.substring(0, content.length() - 1));
         }
     }
 
@@ -170,7 +189,8 @@ public class EngenhoBusca {
      * Stores Text into {@link #servers}.
      * @param head Head of {@link #texts}
      */
-    private static void storeText(Text head) {
+    private static StringBuilder storeText(Text head) {
+        StringBuilder result = new StringBuilder();
         int hash = 0;
         Text currentNode = head.next;
         while (currentNode != null) {
@@ -193,15 +213,28 @@ public class EngenhoBusca {
                     throw new RuntimeException("Number of double hash tries exceeded");
             }
 
+            // Prints the Server in which the Text was stored,
+            // and all of it's previous Text
+            if (tries == 1) {
+                result.append("[S" + hash + "] ");
+                result.append(servers[hash].getTexts() + "\n");
+            } else {
+                result.append("S" + primaryServer + "->S" + hash + "\n");
+                result.append("[S" + hash + "] ");
+                result.append(servers[hash].getTexts() + "\n");
+            }
+
             currentNode = currentNode.next;
         }
+
+        return result;
     }
 
     public static void main(String[] args) {
         try {
             readFile(args[0]);
 
-            storeText(texts);
+            writeToFile(args[1], storeText(texts));
             
         } catch (Exception ex) {
             ex.printStackTrace();
